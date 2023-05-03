@@ -5,7 +5,9 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
+import { ToastContainer, toast } from "react-toastify";
 
 const auth = getAuth();
 
@@ -32,13 +34,29 @@ function Register() {
   };
 
   const handleSubmit = (event) => {
+    event.preventDefault();
     if (email && password) {
+      if (password.length < 6) {
+        toast("Please Add More Password");
+        return;
+      }
       console.log(email, password);
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
           console.log(user, userCredential);
+          updateProfile(auth.currentUser, {
+            displayName: name,
+            photoURL: photoUrl,
+          })
+            .then(() => {
+              // Profile updated!
+              // ...
+            })
+            .catch((error) => {
+              console.log(error.message);
+            });
           // ...
         })
         .catch((error) => {
@@ -46,8 +64,8 @@ function Register() {
           const errorCode = error.code;
           const errorMessage = error.message;
         });
-      event.preventDefault();
     } else {
+      toast("Please Fill Email Field And Password");
       return;
     }
     // TODO: implement registration logic
@@ -141,6 +159,8 @@ function Register() {
           </div>
         </form>
       </div>
+
+      <ToastContainer />
     </div>
   );
 }

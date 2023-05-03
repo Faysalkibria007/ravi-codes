@@ -13,6 +13,7 @@ import {
   signOut,
 } from "firebase/auth";
 import app from "../../firebase/firebase.config";
+import { ToastContainer, toast } from "react-toastify";
 
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
@@ -50,7 +51,11 @@ function Login() {
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
+          toast(errorMessage);
         });
+    } else {
+      toast("Please Fill Email Field And Password");
+      return;
     }
   };
 
@@ -209,17 +214,10 @@ function Login() {
               Forgot Password
             </Link>
           </div>
-
-          <button
-            onClick={() => {
-              logout();
-            }}
-            className="bg-black p-2 text-white"
-          >
-            Log out
-          </button>
         </form>
       </div>
+
+      <ToastContainer />
     </div>
   );
 }
