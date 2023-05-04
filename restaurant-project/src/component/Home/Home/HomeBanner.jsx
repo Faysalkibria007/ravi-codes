@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
-import img1 from "../../../../public/Images/i1.jpg";
-import img3 from "../../../../public/Images/ii2.jpg";
-import img4 from "../../../../public/Images/i2.webp";
+import img1 from "../../../Images/i1.jpg";
+import img3 from "../../../Images/ii2.jpg";
+import img4 from "../../../Images/i2.webp";
 
 import HomeCard from "./HomeCard";
 
 const HomeBanner = () => {
-
-
   const [chefs, setChefs] = useState([]);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-      fetch('http://localhost:5000/chefs')
-          .then(res => res.json())
-          .then(data => setChefs(data));
-}, []);
+    fetch("http://localhost:5000/chefs")
+      .then((res) => res.json())
+      .then((data) => {
+        setChefs(data);
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div>
@@ -62,9 +63,21 @@ const HomeBanner = () => {
         >
           Our Chef
         </h1>
-        {chefs.map((chef) => (
-          <HomeCard key={chef.id} chef = {chef}></HomeCard>
-        ))}
+
+        {loading ? (
+          <div className=" flex justify-center">
+            <div
+              className="radial-progress animate-spin my-3"
+              style={{ "--value": 50 }}
+            ></div>
+          </div>
+        ) : (
+          <>
+            {chefs.map((chef) => (
+              <HomeCard key={chef.id} chef={chef}></HomeCard>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

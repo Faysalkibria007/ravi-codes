@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import img from "../../../../restaurant-project/public/Images/1870126.png";
 import { Link } from "react-router-dom";
 import app from "../../firebase/firebase.config";
 import { onAuthStateChanged, signOut, getAuth } from "firebase/auth";

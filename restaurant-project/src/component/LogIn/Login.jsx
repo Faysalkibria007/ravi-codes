@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 
@@ -16,12 +16,16 @@ import app from "../../firebase/firebase.config";
 import { ToastContainer, toast } from "react-toastify";
 
 const auth = getAuth();
-const provider = new GoogleAuthProvider();
-const provider2 = new GithubAuthProvider();
+const googleProvider = new GoogleAuthProvider();
+const githubProvider = new GithubAuthProvider();
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -46,6 +50,8 @@ function Login() {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
+          navigate(from, { replace: true });
+
           // ...
         })
         .catch((error) => {
@@ -59,58 +65,33 @@ function Login() {
     }
   };
 
-  const logout = () => {
-    signOut(auth)
-      .then(() => {
-        // Sign-out successful.
-      })
-      .catch((error) => {
-        // An error happened.
-      });
-  };
-
   const googleLogin = () => {
-    signInWithPopup(auth, provider)
+    signInWithPopup(auth, googleProvider)
       .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const token = credential.accessToken;
-        // The signed-in user info.
         const user = result.user;
-        // IdP data available using getAdditionalUserInfo(result)
-        // ...
+        navigate(from, { replace: true });
       })
       .catch((error) => {
-        // Handle Errors here.
         const errorCode = error.code;
         const errorMessage = error.message;
-        // The email of the user's account used.
         const email = error.customData.email;
-        // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
       });
   };
-
-  const gitHubLogin = () => {
-    signInWithPopup(auth, provider2)
+  const githubLogin = () => {
+    signInWithPopup(auth, githubProvider)
       .then((result) => {
-        // This gives you a GitHub Access Token. You can use it to access the GitHub API.
         const credential = GithubAuthProvider.credentialFromResult(result);
         const token = credential.accessToken;
-
-        // The signed-in user info.
         const user = result.user;
-        // IdP data available using getAdditionalUserInfo(result)
-        // ...
+        navigate(from, { replace: true });
       })
       .catch((error) => {
-        // Handle Errors here.
         const errorCode = error.code;
         const errorMessage = error.message;
-        // The email of the user's account used.
         const email = error.customData.email;
-        // The AuthCredential type that was used.
         const credential = GithubAuthProvider.credentialFromError(error);
         // ...
       });
@@ -175,46 +156,43 @@ function Login() {
               Log in
             </button>
           </div>
+        </form>
+        <div>
+          <button
+            className="w-full bg-gray-900 text-white rounded-md py-2 font-bold"
+            onClick={() => googleLogin()}
+          >
+            Google Sign-in
+          </button>
+        </div>
 
-          <div>
-            <button
-              type="submit"
-              className="w-full bg-gray-900 text-white rounded-md py-2 font-bold"
-              onClick={() => googleLogin()}
-            >
-              Google Sign-in
-            </button>
-          </div>
+        <div className="mt-5">
+          <button
+            className="w-full bg-gray-900 text-white rounded-md py-2 font-bold"
+            onClick={() => gitHubLogin()}
+          >
+            GitHub Sign-in
+          </button>
+        </div>
 
-          <div className="mt-5">
-            <button
-              type="submit"
-              className="w-full bg-gray-900 text-white rounded-md py-2 font-bold"
-              onClick={() => gitHubLogin()}
-            >
-              GitHub Sign-in
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <Link
-                to="/register"
-                className="font-medium text-gray-900 hover:text-gray-700"
-              >
-                Create an account
-              </Link>
-            </div>
-
+        <div className="flex items-center justify-between">
+          <div className="text-sm">
             <Link
-              to="/forgot-password"
-              className="
-            font-medium text-gray-900 hover:text-gray-700"
+              to="/register"
+              className="font-medium text-gray-900 hover:text-gray-700"
             >
-              Forgot Password
+              Create an account
             </Link>
           </div>
-        </form>
+
+          <Link
+            to="/forgot-password"
+            className="
+            font-medium text-gray-900 hover:text-gray-700"
+          >
+            Forgot Password
+          </Link>
+        </div>
       </div>
 
       <ToastContainer />
